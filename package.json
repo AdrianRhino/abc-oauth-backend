@@ -1,0 +1,12 @@
+{
+    "name": "abc-oauth-backend",
+    "type": "module",
+    "scripts": {
+      "dev": "node server.js"
+    },
+    "dependencies": {
+      "express": "^4.19.2",
+      "dotenv": "^16.4.5",
+      "cookie-parser": "^1.4.6"
+    }
+  }
