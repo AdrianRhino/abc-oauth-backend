@@ -1,37 +1,33 @@
 import express from "express";
-import "dotenv/config";
+import { getSupplierConfig, getAvailableEnvironments } from "../../utils/getSupplierConfig.js";
 
 const router = express.Router();
 
-const {
-    SRSID_STAGING,
-    SRSSECRET_STAGING
-} = process.env;
-
-const SRS_CLIENT_ID = SRSID_STAGING;
-const SRS_CLIENT_SECRET = SRSSECRET_STAGING;
-
-const SRS_AUTH_URL = "https://services-qa.roofhub.pro/authentication/token"; // "https://services.roofhub.pro/authentication/token";
-
 router.get("/login", async (req, res) => {
   try {
-    // Check environment variables
-    if (!SRS_CLIENT_ID || !SRS_CLIENT_SECRET) {
+    // Get environment from query param or use default
+    const environment = req.query.env || null;
+    
+    // Get config for the selected environment
+    const config = getSupplierConfig("srs", environment);
+    
+    if (!config.clientId || !config.clientSecret) {
       return res.status(400).json({ 
-        error: "SRSID_STAGING and SRSSECRET_STAGING environment variables are required",
+        error: `SRS credentials missing for environment: ${environment || "default"}`,
+        availableEnvironments: getAvailableEnvironments("srs")
       });
     }
 
     // Build request body
     const body = new URLSearchParams({
       grant_type: "client_credentials",
-      client_id: SRS_CLIENT_ID,
-      client_secret: SRS_CLIENT_SECRET,
+      client_id: config.clientId,
+      client_secret: config.clientSecret,
       scope: "ALL",
     });
 
     // Make API request
-    const response = await fetch(SRS_AUTH_URL, {
+    const response = await fetch(config.authUrl, {
       method: "POST",
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
@@ -59,7 +55,8 @@ router.get("/login", async (req, res) => {
         error: "SRS authentication failed",
         status: response.status,
         statusText: response.statusText,
-        url: SRS_AUTH_URL,
+        url: config.authUrl,
+        environment: environment || "default",
         data: data
       });
     }
@@ -79,6 +76,7 @@ router.get("/login", async (req, res) => {
       access_token: data.access_token,
       expires_in: data.expires_in,
       token_type: data.token_type,
+      environment: environment || "default",
       data: data
     });
   } catch (err) {

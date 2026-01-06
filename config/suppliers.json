@@ -1,0 +1,56 @@
+{
+  "abc": {
+    "environments": {
+      "sandbox": {
+        "authBase": "${ABC_AUTH_BASE}",
+        "apiBase": "${ABC_API_BASE}",
+        "clientId": "${ABC_CLIENT_ID_SANDBOX}",
+        "clientSecret": "${ABC_CLIENT_SECRET_SANDBOX}"
+      },
+      "production": {
+        "authBase": "${ABC_AUTH_BASE_PROD}",
+        "apiBase": "${ABC_API_BASE_PROD}",
+        "clientId": "${ABC_CLIENT_ID_PROD}",
+        "clientSecret": "${ABC_CLIENT_SECRET_PROD}"
+      }
+    },
+    "defaultEnvironment": "sandbox"
+  },
+  "srs": {
+    "environments": {
+      "staging": {
+        "authUrl": "https://services-qa.roofhub.pro/authentication/token",
+        "apiBase": "${SRS_API_BASE_STAGING}",
+        "clientId": "${SRSID_STAGING}",
+        "clientSecret": "${SRSSECRET_STAGING}"
+      },
+      "production": {
+        "authUrl": "https://services.roofhub.pro/authentication/token",
+        "apiBase": "${SRS_API_BASE_PROD}",
+        "clientId": "${SRSID_PROD}",
+        "clientSecret": "${SRSSECRET_PROD}"
+      }
+    },
+    "defaultEnvironment": "staging"
+  },
+  "beacon": {
+    "environments": {
+      "sandbox": {
+        "loginUrl": "https://beaconproplus.com/v1/rest/com/becn/login",
+        "apiBase": "${BEACON_API_BASE}",
+        "username": "${BEACON_USERNAME}",
+        "password": "${BEACON_PASSWORD}",
+        "apiSiteId": "${BEACON_API_SITE_ID}"
+      },
+      "production": {
+        "loginUrl": "https://beaconproplus.com/v1/rest/com/becn/login",
+        "apiBase": "${BEACON_API_BASE_PROD}",
+        "username": "${BEACON_USERNAME_PROD}",
+        "password": "${BEACON_PASSWORD_PROD}",
+        "apiSiteId": "${BEACON_API_SITE_ID_PROD}"
+      }
+    },
+    "defaultEnvironment": "sandbox"
+  }
+}
+

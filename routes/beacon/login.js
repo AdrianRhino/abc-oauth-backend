@@ -1,38 +1,34 @@
 import express from "express";
-import "dotenv/config";
+import { getSupplierConfig } from "../../utils/getSupplierConfig.js";
 
 const router = express.Router();
 
-const {
-  BEACON_USERNAME,
-  BEACON_PASSWORD,
-  BEACON_API_SITE_ID
-} = process.env;
-
-const BEACON_LOGIN_URL = "https://beaconproplus.com/v1/rest/com/becn/login";
-
 router.get("/login", async (req, res) => {
   try {
-    if (!BEACON_USERNAME || !BEACON_PASSWORD) {
+    // Get environment from query param or use default
+    const environment = req.query.env || null;
+    const config = getSupplierConfig("beacon", environment);
+    
+    if (!config.username || !config.password) {
       return res.status(400).json({ 
-        error: "BEACON_USERNAME and BEACON_PASSWORD environment variables are required" 
+        error: `Beacon credentials missing for environment: ${environment || "default"}`
       });
     }
 
     const loginPayload = {
-      username: BEACON_USERNAME,
-      password: BEACON_PASSWORD,
+      username: config.username,
+      password: config.password,
       siteId: "homeSite",
       persistentLoginType: "RememberMe",
       userAgent: "desktop",
     };
 
     // Only include apiSiteId if configured
-    if (BEACON_API_SITE_ID && BEACON_API_SITE_ID.trim() !== "") {
-      loginPayload.apiSiteId = BEACON_API_SITE_ID;
+    if (config.apiSiteId && config.apiSiteId.trim() !== "") {
+      loginPayload.apiSiteId = config.apiSiteId;
     }
 
-    const response = await fetch(BEACON_LOGIN_URL, {
+    const response = await fetch(config.loginUrl, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -61,6 +57,7 @@ router.get("/login", async (req, res) => {
     res.json({
       success: true,
       cookies: cookieString,
+      environment: environment || "default",
       data: data
     });
   } catch (err) {
