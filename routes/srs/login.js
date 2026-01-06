@@ -5,11 +5,11 @@ const router = express.Router();
 
 const {
     SRSID_STAGING,
-    SRSECRET_STAGING
+    SRSSECRET_STAGING
 } = process.env;
 
 const SRS_CLIENT_ID = SRSID_STAGING;
-const SRS_CLIENT_SECRET = SRS_SECRET_STAGING;
+const SRS_CLIENT_SECRET = SRSSECRET_STAGING;
 
 const SRS_AUTH_URL = "https://services.roofhub.pro/authentication/token";
 
