@@ -19,12 +19,6 @@ router.get("/login", async (req, res) => {
     if (!SRS_CLIENT_ID || !SRS_CLIENT_SECRET) {
       return res.status(400).json({ 
         error: "SRSID_STAGING and SRSSECRET_STAGING environment variables are required",
-        debug: {
-          SRSID_STAGING: SRSID_STAGING ? "set" : "missing",
-          SRSSECRET_STAGING: SRSSECRET_STAGING ? "set" : "missing",
-          SRS_CLIENT_ID: SRS_CLIENT_ID ? "set" : "null",
-          SRS_CLIENT_SECRET: SRS_CLIENT_SECRET ? "set" : "null"
-        }
       });
     }
 
