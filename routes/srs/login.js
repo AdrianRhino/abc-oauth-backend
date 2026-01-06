@@ -5,7 +5,7 @@ const router = express.Router();
 
 const {
     SRSID_STAGING,
-    SRS_SECRET_STAGING
+    SRSECRET_STAGING
 } = process.env;
 
 const SRS_CLIENT_ID = SRSID_STAGING;
