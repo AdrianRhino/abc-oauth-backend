@@ -11,7 +11,7 @@ const {
 const SRS_CLIENT_ID = SRSID_STAGING;
 const SRS_CLIENT_SECRET = SRSSECRET_STAGING;
 
-const SRS_AUTH_URL = "https://services.roofhub.pro/authentication/token";
+const SRS_AUTH_URL = "https://services-qa.roofhub.pro/authentication/token"; // "https://services.roofhub.pro/authentication/token";
 
 router.get("/login", async (req, res) => {
   try {
