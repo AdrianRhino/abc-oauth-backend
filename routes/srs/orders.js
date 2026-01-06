@@ -6,17 +6,17 @@ const router = express.Router();
 const { SRS_API_BASE } = process.env;
 
 async function getAccessToken() {
-  const { SRSID_STAGING, SRS_SECRET_STAGING } = process.env;
-  const SRS_AUTH_URL = "https://services.roofhub.pro/authentication/token";
+  const { SRSID_STAGING, SRSSECRET_STAGING } = process.env;
+  const SRS_AUTH_URL = "https://services-qa.roofhub.pro/authentication/token";
 
-  if (!SRSID_STAGING || !SRS_SECRET_STAGING) {
-    throw new Error("SRSID_STAGING and SRS_SECRET_STAGING environment variables are required");
+  if (!SRSID_STAGING || !SRSSECRET_STAGING) {
+    throw new Error("SRSID_STAGING and SRSSECRET_STAGING environment variables are required");
   }
 
   const body = new URLSearchParams({
     grant_type: "client_credentials",
     client_id: SRSID_STAGING,
-    client_secret: SRS_SECRET_STAGING,
+    client_secret: SRSSECRET_STAGING,
     scope: "ALL",
   });
 

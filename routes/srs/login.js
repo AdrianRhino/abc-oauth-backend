@@ -15,12 +15,20 @@ const SRS_AUTH_URL = "https://services-qa.roofhub.pro/authentication/token"; // 
 
 router.get("/login", async (req, res) => {
   try {
+    // Check environment variables
     if (!SRS_CLIENT_ID || !SRS_CLIENT_SECRET) {
       return res.status(400).json({ 
-        error: "SRSID_STAGING and SRS_SECRET_STAGING environment variables are required" 
+        error: "SRSID_STAGING and SRSSECRET_STAGING environment variables are required",
+        debug: {
+          SRSID_STAGING: SRSID_STAGING ? "set" : "missing",
+          SRSSECRET_STAGING: SRSSECRET_STAGING ? "set" : "missing",
+          SRS_CLIENT_ID: SRS_CLIENT_ID ? "set" : "null",
+          SRS_CLIENT_SECRET: SRS_CLIENT_SECRET ? "set" : "null"
+        }
       });
     }
 
+    // Build request body
     const body = new URLSearchParams({
       grant_type: "client_credentials",
       client_id: SRS_CLIENT_ID,
@@ -28,6 +36,7 @@ router.get("/login", async (req, res) => {
       scope: "ALL",
     });
 
+    // Make API request
     const response = await fetch(SRS_AUTH_URL, {
       method: "POST",
       headers: {
@@ -36,19 +45,53 @@ router.get("/login", async (req, res) => {
       body
     });
 
-    const data = await response.json();
-    if (!response.ok) {
-      return res.status(response.status).json(data);
+    // Parse response
+    let data;
+    try {
+      const text = await response.text();
+      data = text ? JSON.parse(text) : {};
+    } catch (parseError) {
+      return res.status(500).json({
+        error: "Failed to parse SRS API response",
+        parseError: parseError.message,
+        status: response.status,
+        statusText: response.statusText
+      });
     }
 
+    // Handle error responses
+    if (!response.ok) {
+      return res.status(response.status).json({
+        error: "SRS authentication failed",
+        status: response.status,
+        statusText: response.statusText,
+        url: SRS_AUTH_URL,
+        data: data
+      });
+    }
+
+    // Check if access_token exists in response
+    if (!data.access_token) {
+      return res.status(500).json({
+        error: "No access_token in SRS response",
+        responseKeys: Object.keys(data),
+        data: data
+      });
+    }
+
+    // Success response
     res.json({
       success: true,
       access_token: data.access_token,
       expires_in: data.expires_in,
+      token_type: data.token_type,
       data: data
     });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ 
+      error: err.message,
+      stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
+    });
   }
 });
 
