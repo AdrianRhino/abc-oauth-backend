@@ -7,17 +7,17 @@ const { SRS_API_BASE } = process.env;
 
 // Helper to get access token
 async function getAccessToken() {
-  const { SRS_CLIENT_ID, SRS_CLIENT_SECRET } = process.env;
+  const { SRSID_STAGING, SRS_SECRET_STAGING } = process.env;
   const SRS_AUTH_URL = "https://services.roofhub.pro/authentication/token";
 
-  if (!SRS_CLIENT_ID || !SRS_CLIENT_SECRET) {
-    throw new Error("SRS_CLIENT_ID and SRS_CLIENT_SECRET environment variables are required");
+  if (!SRSID_STAGING || !SRS_SECRET_STAGING) {
+    throw new Error("SRSID_STAGING and SRS_SECRET_STAGING environment variables are required");
   }
 
   const body = new URLSearchParams({
     grant_type: "client_credentials",
-    client_id: SRS_CLIENT_ID,
-    client_secret: SRS_CLIENT_SECRET,
+    client_id: SRSID_STAGING,
+    client_secret: SRS_SECRET_STAGING,
     scope: "ALL",
   });
 

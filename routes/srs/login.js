@@ -17,7 +17,7 @@ router.get("/login", async (req, res) => {
   try {
     if (!SRS_CLIENT_ID || !SRS_CLIENT_SECRET) {
       return res.status(400).json({ 
-        error: "SRS_CLIENT_ID and SRS_CLIENT_SECRET environment variables are required" 
+        error: "SRSID_STAGING and SRS_SECRET_STAGING environment variables are required" 
       });
     }
 
