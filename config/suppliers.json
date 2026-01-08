@@ -4,12 +4,14 @@
       "sandbox": {
         "authBase": "${ABC_AUTH_BASE}",
         "apiBase": "${ABC_API_BASE}",
+        "pricingBase": "https://partners-sb.abcsupply.com",
         "clientId": "${ABC_CLIENT_ID_SANDBOX}",
         "clientSecret": "${ABC_CLIENT_SECRET_SANDBOX}"
       },
       "production": {
         "authBase": "${ABC_AUTH_BASE_PROD}",
         "apiBase": "${ABC_API_BASE_PROD}",
+        "pricingBase": "https://partner.abcsupply.com",
         "clientId": "${ABC_CLIENT_ID_PROD}",
         "clientSecret": "${ABC_CLIENT_SECRET_PROD}"
       }

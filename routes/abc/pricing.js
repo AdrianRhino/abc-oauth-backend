@@ -1,25 +1,22 @@
 import express from "express";
-import "dotenv/config";
+import { getSupplierConfig } from "../../utils/getSupplierConfig.js";
 
 const router = express.Router();
 
-const { ABC_API_BASE } = process.env;
+function toBase64(str) {
+  return Buffer.from(str).toString("base64");
+}
 
-// Helper to get access token (you can cache this in production)
-async function getAccessToken() {
-  const { ABC_AUTH_BASE, ABC_CLIENT_ID_SANDBOX, ABC_CLIENT_SECRET_SANDBOX } = process.env;
+async function getAccessToken(environment) {
+  const config = getSupplierConfig("abc", environment);
   
-  function toBase64(str) {
-    return Buffer.from(str).toString("base64");
-  }
-
-  const tokenUrl = `${ABC_AUTH_BASE}/v1/token`;
+  const tokenUrl = `${config.authBase}/v1/token`;
   const body = new URLSearchParams({ grant_type: "client_credentials" });
 
   const response = await fetch(tokenUrl, {
     method: "POST",
     headers: {
-      Authorization: "Basic " + toBase64(`${ABC_CLIENT_ID_SANDBOX}:${ABC_CLIENT_SECRET_SANDBOX}`),
+      Authorization: "Basic " + toBase64(`${config.clientId}:${config.clientSecret}`),
       "Content-Type": "application/x-www-form-urlencoded",
     },
     body
@@ -33,23 +30,49 @@ async function getAccessToken() {
   return data.access_token;
 }
 
-router.get("/pricing", async (req, res) => {
+router.post("/pricing", async (req, res) => {
   try {
-    const { itemNumber, locationId } = req.query;
+    const environment = req.query.env || null;
+    const config = getSupplierConfig("abc", environment);
+    const token = await getAccessToken(environment);
     
-    if (!itemNumber) {
-      return res.status(400).json({ error: "itemNumber query parameter is required" });
+    // Build the request body from the incoming request
+    const requestBody = req.body;
+    
+    // If they pass simple params, convert to ABC format
+    if (req.body.itemNumber && !req.body.lines) {
+      requestBody = {
+        requestId: req.body.requestId || "Quote: " + Date.now(),
+        shipToNumber: req.body.shipToNumber,
+        branchNumber: req.body.branchNumber,
+        purpose: req.body.purpose || "ordering",
+        lines: [
+          {
+            id: "1",
+            itemNumber: req.body.itemNumber,
+            quantity: req.body.quantity || 1,
+            uom: req.body.uom,
+            length: req.body.length
+          }
+        ]
+      };
+    }
+    
+    if (!requestBody.shipToNumber || !requestBody.branchNumber || !requestBody.lines || requestBody.lines.length === 0) {
+      return res.status(400).json({ 
+        error: "shipToNumber, branchNumber, and lines array are required" 
+      });
     }
 
-    const token = await getAccessToken();
-    const pricingUrl = `${ABC_API_BASE}/v1/pricing?itemNumber=${itemNumber}${locationId ? `&locationId=${locationId}` : ""}`;
+    const pricingUrl = `${config.pricingBase}/api/pricing/v2/prices`;
 
     const response = await fetch(pricingUrl, {
-      method: "GET",
+      method: "POST",
       headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
+      body: JSON.stringify(requestBody)
     });
 
     const data = await response.json();
@@ -64,4 +87,3 @@ router.get("/pricing", async (req, res) => {
 });
 
 export default router;
-
