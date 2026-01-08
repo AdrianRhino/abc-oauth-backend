@@ -19,10 +19,11 @@ router.get("/login", async (req, res) => {
       });
     }
 
-    const tokenUrl = `${config.authBase}/v1/token`;
+    const tokenUrl = `${config.authBase}/v1/token?grant_type=client_credentials&scope=location.read product.read pricing.read account.read order.write order.read`;
 
     const body = new URLSearchParams({
       grant_type: "client_credentials",
+      scope: "location.read product.read pricing.read account.read order.write order.read"
     });
 
     const response = await fetch(tokenUrl, {

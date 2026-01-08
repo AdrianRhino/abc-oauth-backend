@@ -10,8 +10,11 @@ function toBase64(str) {
 async function getAccessToken(environment) {
   const config = getSupplierConfig("abc", environment);
   
-  const tokenUrl = `${config.authBase}/v1/token`;
-  const body = new URLSearchParams({ grant_type: "client_credentials" });
+  const tokenUrl = `${config.authBase}/v1/token?grant_type=client_credentials&scope=location.read product.read pricing.read account.read order.write order.read`;
+  const body = new URLSearchParams({ 
+    grant_type: "client_credentials",
+    scope: "location.read product.read pricing.read account.read order.write order.read"
+  });
 
   const response = await fetch(tokenUrl, {
     method: "POST",
